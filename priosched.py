@@ -84,6 +84,7 @@ class PrioritySchedulingApp:
         ttk.Button(button_frame, text="Add Process", command=self.add_process).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(button_frame, text="Calculate Schedule", command=self.calculate_schedule).grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(button_frame, text="Clear All", command=self.clear_all).grid(row=0, column=2, padx=5, pady=5)
+        ttk.Button(button_frame, text="About", command=self.show_about).grid(row=0, column=3, padx=5, pady=5)
         
         # Process Table
         self.tree = ttk.Treeview(self.root, columns=("PID", "Arrival Time", "Burst Time", "Priority", "Waiting Time", "Turnaround Time"), show="headings")
@@ -118,6 +119,72 @@ class PrioritySchedulingApp:
         self.root.grid_rowconfigure(1, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.gantt_frame.grid_columnconfigure(0, weight=1)
+        
+    def show_about(self):
+        # Create a new Toplevel window for the About section
+        about_window = tk.Toplevel(self.root)
+        about_window.title("About Priority Scheduling Simulator")
+        about_window.geometry("400x300")
+        about_window.resizable(False, False)
+        about_window.configure(bg="#f0f2f5")
+        
+        # About content
+        ttk.Label(
+            about_window,
+            text="Priority Scheduling Simulator",
+            font=("Helvetica", 14, "bold"),
+            background="#f0f2f5"
+        ).pack(pady=10)
+        
+        ttk.Label(
+            about_window,
+            text="Developed by Group #2",
+            font=("Helvetica", 12),
+            background="#f0f2f5"
+        ).pack(pady=5)
+        
+        ttk.Label(
+            about_window,
+            text="Group Members:",
+            font=("Helvetica", 11, "bold"),
+            background="#f0f2f5"
+        ).pack(pady=5)
+        
+        members = [
+            "Cabael, Ben Jiru",
+            "Copioso, Mark Rainier S.",
+            "Castillo, John Paul",
+            "Centeno, John Michael",
+            "Yolola, Lenar Andrei P.",
+            "Sulte, Steven",
+            "Valdesco, Apple",
+            "Verana, Naomi",
+            "Tan, Samantha",
+            "Wagan, Rowena"
+        ]
+        
+        for member in members:
+            ttk.Label(
+                about_window,
+                text=member,
+                font=("Helvetica", 10),
+                background="#f0f2f5"
+            ).pack(pady=2)
+        
+        ttk.Label(
+            about_window,
+            text="Course: Operating Systems\nSemester: Spring 2025\nInstitution: [Your University]",
+            font=("Helvetica", 10),
+            background="#f0f2f5",
+            justify="center"
+        ).pack(pady=10)
+        
+        # Close button
+        ttk.Button(
+            about_window,
+            text="Close",
+            command=about_window.destroy
+        ).pack(pady=10)
         
     def clear_placeholder(self, event, entry, placeholder):
         if entry.get() == placeholder:
@@ -330,15 +397,17 @@ class PrioritySchedulingApp:
     def draw_gantt_chart(self):
         if not self.schedule:
             return
-
+            
+        # Canvas dimensions
         canvas_width = 820
         canvas_height = 120
         self.canvas.config(width=canvas_width)
         
+        # Calculate total time for scaling
         total_time = max(segment["end"] for segment in self.schedule)
         if total_time == 0:
             return
-        
+            
         scale = (canvas_width - 70) / total_time  # 70 pixels for labels
         y_start = 40
         bar_height = 40
@@ -365,11 +434,13 @@ class PrioritySchedulingApp:
             x_start = 50 + segment["start"] * scale
             x_end = 50 + segment["end"] * scale
             self.canvas.create_rectangle(x_start, y_start, x_end, y_start + bar_height, fill=color, outline="#333333")
+            # Only show text if segment is wide enough
             if x_end - x_start > 20:
                 text_x = (x_start + x_end) / 2
                 text_y = y_start + bar_height / 2
                 self.canvas.create_text(text_x, text_y, text=pid, font=("Helvetica", 10, "bold"), fill="#333333")
         
+        # Draw Y-axis label
         self.canvas.create_text(30, y_start + bar_height / 2, text="Processes", angle=90, font=("Helvetica", 10, "bold"), fill="#333333")
         
     def clear_all(self):
